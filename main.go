@@ -3,10 +3,11 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"google.golang.org/protobuf/types/pluginpb"
 	"os"
 	"path/filepath"
 	"text/template"
+
+	"google.golang.org/protobuf/types/pluginpb"
 
 	"google.golang.org/protobuf/compiler/protogen"
 )
@@ -46,12 +47,10 @@ func handleMessage(message *protogen.Message) []*protogen.Enum {
 
 // generateFile generates a .pb.enum.go file to add additional methods for enum types
 func generateFile(gen *protogen.Plugin, file *protogen.File) *protogen.GeneratedFile {
-	filename := file.GeneratedFilenamePrefix + ".pb.enum.go"
-	g := gen.NewGeneratedFile(filename, file.GoImportPath)
 
 	t, err := template.New("proto-gen-go-enum template").Parse(tpl)
 	if err != nil {
-		panic(err)
+		panic("fail to parse template:" + err.Error())
 	}
 
 	var buf bytes.Buffer
@@ -63,6 +62,11 @@ func generateFile(gen *protogen.Plugin, file *protogen.File) *protogen.Generated
 	}
 	// handle top level enums
 	enums = append(enums, file.Enums...)
+
+	// ignore the generation when the file does not include any enum type
+	if len(enums) == 0 {
+		return nil
+	}
 
 	type data struct {
 		File    *protogen.File
@@ -79,12 +83,13 @@ func generateFile(gen *protogen.Plugin, file *protogen.File) *protogen.Generated
 	err = t.Execute(&buf, d)
 
 	if err != nil {
-		panic(err)
+		panic("fail to render tempalte:" + err.Error())
 	}
 
+	g := gen.NewGeneratedFile(file.GeneratedFilenamePrefix+".pb.enum.go", file.GoImportPath)
 	_, err = g.Write(buf.Bytes())
 	if err != nil {
-		panic(err)
+		panic("fail to write file:" + err.Error())
 	}
 	return g
 }

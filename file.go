@@ -9,6 +9,7 @@ package {{ .File.GoPackageName }}
 import (
 	"database/sql/driver"
 	"entgo.io/ent/schema/field"
+	go_enum "github.com/devtoolskits/protoc-gen-go-enum/pkg"
 )
 
 var (
@@ -21,15 +22,7 @@ var (
 {{ range .Enums }}
 // Values implements ent/schema/field.EnumValues
 func (x {{ .GoIdent.GoName }}) Values() []string {
-	x.String()
-	var members []string
-	v := x.Descriptor().Values()
-	for i := 0; i < v.Len(); i++ {
-		if n := v.Get(i).Name(); n.IsValid() {
-			members = append(members, string(n))
-		}
-	}
-	return members
+	return go_enum.EnumMembers(x)
 }
 
 // Value implements sql/driver.Valuer

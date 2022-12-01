@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package fixture;
+
+option go_package = "../fixture";
+
+// global enum
+enum BAR {
+  BAR_UNSPECIFIED = 0;
+  BAR_TYPE_1 = 1;
+  BAR_TYPE_2 = 2;
+}
+
+// nested enum
+message FOO {
+  enum BAR {
+    BAR_UNSPECIFIED = 0;
+    BAR_TYPE_1 = 1;
+    BAR_TYPE_2 = 2;
+   }
+   BAR bar = 1;
+}
