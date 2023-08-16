@@ -13,7 +13,7 @@ import (
 )
 
 // version is the current module version, which keep same with the git tags
-const version = "v0.1.0"
+var version string
 
 func main() {
 	if len(os.Args) == 2 && os.Args[1] == "--version" {
